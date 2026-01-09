@@ -13,7 +13,11 @@ import re
 from textwrap import fill
 from inspect import cleandoc
 
-from visa import VisaTypeError
+try:
+    from pyvisa import VisaTypeError
+except ImportError:
+    from visa import VisaTypeError
+
 
 from ..driver_tools import (InstrIOError, instrument_property,
                             secure_communication)

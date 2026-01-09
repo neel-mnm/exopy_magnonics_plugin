@@ -18,7 +18,10 @@ import logging
 from ..driver_tools import (BaseInstrument, InstrIOError, InstrError,
                             secure_communication, instrument_property)
 from ..visa_tools import VisaInstrument
-from visa import VisaTypeError
+try:
+    from pyvisa import VisaTypeError
+except ImportError:
+    from visa import VisaTypeError
 
 
 FORMATTING_DICT = {'PHAS': lambda x: np.angle(x, deg=True),

@@ -17,7 +17,11 @@ from threading import Lock
 from contextlib import contextmanager
 
 import numpy as np
-from visa import VisaTypeError
+try:
+    from pyvisa import VisaTypeError
+except ImportError:
+    from visa import VisaTypeError
+
 from pyvisa.errors import InvalidSession, VisaIOError
 
 from ..driver_tools import (BaseInstrument, InstrIOError, secure_communication,

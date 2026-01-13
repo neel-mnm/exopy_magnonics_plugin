@@ -11,7 +11,7 @@
 """
 from textwrap import fill
 
-from enaml.widgets.api import (GroupBox, Label, Field, ObjectCombo)
+from enaml.widgets.api import (GroupBox, Label, Field, ObjectCombo, Container, RadioButton, HGroup)
 from enaml.stdlib.fields import FloatField
 from enaml.layout.api import factory
 
@@ -106,3 +106,22 @@ enamldef SetDemodBWandSampleView(InstrView): view:
     QtLineCompleter: datarate_val:
         hug_width = 'ignore'
         text := task.datarate
+
+
+enamldef SetOutputStateView(InstrView): view:
+    """View for SetOutputStateTask
+
+    """
+    constraints = [factory(auto_grid_layout)]
+    Label:
+        text = 'Enable Output'
+    
+    HGroup:
+        RadioButton:
+            text="ON"        
+            checked:=task.value
+        
+        RadioButton:
+            text="OFF"
+            checked << (not task.value)
+            checked >> task.value

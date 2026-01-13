@@ -385,6 +385,13 @@ class HF2LIOutChannel(BaseInstrument):
                 '/'+device+'/sigouts/{}/amplitudes/'.format(channel_num-1))
         self._header_range = (
                 '/'+device+'/sigouts/{}/range'.format(channel_num-1))
+        
+        #channel on or off
+        self._header_outstate = (
+                '/'+device+'/sigouts/{}/on'.format(channel_num-1))
+        #enable and disale individual outputs
+        self._header_outampl_enable = (
+                '/'+device+'/sigouts/{}/enables/'.format(channel_num-1))
 
     def reopen_connection(self):
 
@@ -406,6 +413,23 @@ class HF2LIOutChannel(BaseInstrument):
             raise InstrIOError('The instrument did not '
                                'set amplitude correctly by {} V'.format(
                                              abs(value-ampl)*Vrange))
+        
+        self._daqserv.set(self._header_outampl_enable+'{}'.format(fromdemod-1),1)
+            
+    def open_signal_output(self, state):
+        """
+        Set signal output to ON or OFF 
+
+        """
+        num_outamps=8
+        
+        #first turn off all outputs
+        for i in range(num_outamps):
+            self._daqserv.set(
+                self._header_outampl_enable+'{}'.format(i), 0)
+            
+        self._daqserv.set(self._header_outstate, state)
+        self._daqserv.echoDevice(self._device_id)
 
     def get_out_range(self):
         """

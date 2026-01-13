@@ -14,7 +14,7 @@ import logging
 import numbers
 from inspect import cleandoc
 
-from atom.api import (Int, Value, Str, Float, Bool, set_default)
+from atom.api import (Int, Value, Str, Float, Bool, set_default, Enum)
 
 from exopy.tasks.api import (InstrumentTask, TaskInterface,
                             InterfaceableTaskMixin, validators)
@@ -53,6 +53,33 @@ class SetOutputAmplitudeTask(InterfaceableTaskMixin, InstrumentTask):
         self.driver.set_out_amplitude(self.format_and_eval_string(self.amplitude),fromdemod=fromdemod)
         
         self.write_in_database('Vac(mV)', self.format_and_eval_string(self.amplitude))
+
+class SetOutputStateTask(InterfaceableTaskMixin, InstrumentTask):
+    """Sets the state of the signal outputs in a lockin.
+
+    """
+    # Amplitude.
+    value = Bool(False).tag(pref=True)
+
+    database_entries = set_default({'LI_output': "OFF"})
+
+    def i_perform(self,value=None, fromdemod=None):
+        """ON or OFF.
+
+        """
+        if self.value:
+            self.driver.open_signal_output(True)
+            self.write_in_database('LI_output', "ON")
+        
+        elif not self.value:
+            self.driver.open_signal_output(False)
+            self.write_in_database('LI_output', "OFF")
+        
+        
+
+
+
+
 
 class SetDemodOscTask(InterfaceableTaskMixin, InstrumentTask):
     """Sets the osc for demod by a lockin.

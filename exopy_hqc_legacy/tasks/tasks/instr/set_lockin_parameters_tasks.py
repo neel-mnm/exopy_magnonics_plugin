@@ -75,11 +75,19 @@ class SetOutputStateTask(InterfaceableTaskMixin, InstrumentTask):
             self.driver.open_signal_output(False)
             self.write_in_database('LI_output', "OFF")
         
-        
+class SetOutputOffsetTask(InterfaceableTaskMixin, InstrumentTask):
+    """
+    Set DC output in the Lockin
+    """   
+    amplitude = Str().tag(pref=True)
+    database_entries = set_default({'V_off(V)': 0})
 
-
-
-
+    def i_perform(self,value=None, fromdemod=None):
+        """
+        Set output amplitude
+        """
+        self.driver.set_output_offset(self.format_and_eval_string(self.amplitude))
+        self.write_in_database("V_off(V)",self.format_and_eval_string(self.amplitude))
 
 class SetDemodOscTask(InterfaceableTaskMixin, InstrumentTask):
     """Sets the osc for demod by a lockin.

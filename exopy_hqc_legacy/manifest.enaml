@@ -664,10 +664,21 @@ enamldef HqcLegacyManifest(PluginManifest):
                     Interface:
                         interface = 'set_lockin_parameters_tasks:MultiChannelOutputAmplitudeInterface'
                         views = ['views.multi_channel_LI_views:MultiChannelOutputChanLabel',
-                                 'views.multi_channel_LI_views:MultiChannelOutputChanValue',
-                                 'views.multi_channel_LI_views:MultiChannelOutputDemodLabel',
-                                 'views.multi_channel_LI_views:MultiChannelOutputDemodValue']
+                                 'views.multi_channel_LI_views:MultiChannelOutputChanValue']
                         instruments = ['exopy_hqc_legacy.Legacy.HF2LI']                    
+                Task:
+                    task = 'set_lockin_parameters_tasks:SetOutputOffsetTask'
+                    view = 'views.set_lockin_parameters_view:SetOutputOffsetView'
+                    instruments = ['exopy_hqc_legacy.Legacy.LockInSR7265',
+                                   'exopy_hqc_legacy.Legacy.LockInSR7270',
+                                   'exopy_hqc_legacy.Legacy.LockInSR7280',
+                                   'exopy_hqc_legacy.Legacy.LockInSR830']
+                    metadata = {'loopable': True}
+                    Interface:
+                        interface = 'set_lockin_parameters_tasks:MultiChannelOutputAmplitudeInterface'
+                        views = ['views.multi_channel_LI_views:MultiChannelOutputChanLabel',
+                                 'views.multi_channel_LI_views:MultiChannelOutputChanValue']
+                        instruments = ['exopy_hqc_legacy.Legacy.HF2LI'] 
                 Task:
                     task = 'set_lockin_parameters_tasks:SetDemodOscTask'
                     view = 'views.set_lockin_parameters_view:SetDemodOscTaskView'

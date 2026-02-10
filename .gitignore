@@ -45,3 +45,9 @@ docs/build
 
 # SpyderPorject
 .spyproject
+
+
+
+# .ini and .log
+*.ini
+*.log

@@ -392,6 +392,10 @@ class HF2LIOutChannel(BaseInstrument):
         #enable and disale individual outputs
         self._header_outampl_enable = (
                 '/'+device+'/sigouts/{}/enables/'.format(channel_num-1))
+        #set output DC offset
+        self._header_outampl_offset = (
+                '/'+device+'/sigouts/{}/offset/'.format(channel_num-1))
+        self.availableOutRanges = [0.01,0.1,1,10]
 
     def reopen_connection(self):
 
@@ -428,9 +432,24 @@ class HF2LIOutChannel(BaseInstrument):
             self._daqserv.set(
                 self._header_outampl_enable+'{}'.format(i), 0)
             
-        self._daqserv.set(self._header_outstate, state)
+        self._daqserv.set(self._header_outstate, int(state))
         self._daqserv.echoDevice(self._device_id)
+    
+    def set_output_offset(self, value):
+        """
+        Set value of the DC offset in the output. value in V
+        """
 
+        availableVranges= [v for v in self.availableOutRanges if v>np.abs(value)]
+        if not availableVranges:
+            raise InstrIOError('The instrument did not '
+                               'set amplitude correctly as there is no available range')
+
+        Vrange = min(availableVranges)
+        self._daqserv.set(self._header_range, Vrange)
+        self._daqserv.set(self._header_outampl_offset, value/Vrange)
+
+    
     def get_out_range(self):
         """
         Get the output range for the output channel

@@ -125,3 +125,17 @@ enamldef SetOutputStateView(InstrView): view:
             text="OFF"
             checked << (not task.value)
             checked >> task.value
+
+enamldef SetOutputOffsetView(InstrView): view:
+    """View for the SetOutputOffsetTask
+
+    """
+    constraints = [factory(auto_grid_layout)]
+
+    Label: amp_lab:
+        hug_width = 'ignore'
+        text = 'Voff(V)'
+    QtLineCompleter: amp_val:
+        hug_width = 'ignore'
+        text := task.amplitude
+        tool_tip = fill('Any value between -10 and 10',60)

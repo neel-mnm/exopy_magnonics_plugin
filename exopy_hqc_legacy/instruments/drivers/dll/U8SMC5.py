@@ -229,6 +229,8 @@ class USMC5_USB_Dll(object):
     def apply_standard_settings_dll(self,dev_string,motor_index):
         if dev_string == '8MRU-1TP':
             return pyx.set_profile_8MRU_1TP(self._dll, motor_index)
+        elif dev_string == '8MR151-30-MEn1':
+            return pyx.set_profile_8MR151_30_MEn1(self._dll, motor_index)
         else:
             raise NotImplementedError('Unknown motor name')
 
@@ -617,6 +619,180 @@ class U8SMC5_8MRU_1TP_Motor(DllInstrument):
         self._motorsteps = 600
         self._motorusteps = 256
         self._speed = 10
+
+    def close_connection(self):
+        """Close dll from the controller
+
+        """
+        log = logging.getLogger(__name__)
+        msg = ('Closing connection to 8MRU_1TP motor with dll')
+        log.info(msg)
+        self._cu.release_motor(self._id,self._motorindex)
+
+    def move_motor_abs(self, angle_val):
+        """Move motor by an angle to requested angle (rounded to 0.1deg)
+        after previous step has finished,
+        for consistency
+
+        """
+        #Waits first for previous motion completion
+        t = 0
+        while self.is_moving():
+            time.sleep(0.03)
+            t += 0.03
+            if t > self._motion_timeout:
+                raise InstrIOError('Timeout in waiting for motor to stop from previous motion')
+
+        #Checks angles and position      
+        start_angle = self.get_present_abs_angle()
+        desired_motion_steps = np.abs(angle_val-start_angle)/360*self._motorsteps
+        start_position_step, start_position_ustep = self._cu.get_position(self._motorindex)
+        new_step  = int(np.fix(self._motorsteps*angle_val/360.0))
+        new_ustep = int(np.round((self._motorsteps*angle_val/360.0-new_step)*self._motorusteps))
+
+        if (np.abs(new_step-start_position_step)>0) or (np.abs(new_ustep-start_position_ustep)>0):
+            #Then motion is required
+            self._cu.move_motor(self._motorindex,new_step,new_ustep)
+            time.sleep(0.03)
+            
+            #Waits for motion start
+            t = 0
+            while np.abs(start_angle-self.get_present_abs_angle())<180.0/(self._motorsteps*self._motorusteps):
+                time.sleep(0.01)
+                t += 0.01
+                if t > self._motion_timeout:
+                    raise InstrIOError('Timeout in waiting for motor to start')
+
+            self.is_moving(log_status=True) #Get log
+            time.sleep(0.01)
+
+            #Waits for motion end
+            t = 0
+            while self.is_moving(): 
+                time.sleep(0.01)
+                t += 0.01
+                if t > self._motion_timeout + desired_motion_steps/self._speed:
+                    raise InstrIOError('Timeout in waiting for motor to arrive destination')
+
+        self.is_moving(log_status=True) #Get final log
+
+    def move_motor_rel(self, angle_motion):
+        """Move motor by an angle to requested angle (rounded to 0.1deg)
+        after previous step has finished, 
+        for consistency
+
+        """
+        #Waits first for previous motion completion
+        t = 0
+        while self.is_moving():
+            time.sleep(0.03)
+            t += 0.03
+            if t > self._motion_timeout:
+                raise InstrIOError('Timeout in waiting for motor to stop from previous motion')
+
+        #Checks angles and position      
+        start_angle = self.get_present_abs_angle()
+        desired_motion_steps = np.abs(angle_motion)/360*self._motorsteps
+        new_rstep  = int(np.fix(self._motorsteps*angle_motion/360.0))
+        new_rustep = int(np.round((self._motorsteps*angle_motion/360.0-new_rstep)*self._motorusteps))
+
+        if (np.abs(new_rstep)>0) or (np.abs(new_rustep)>0):
+            #Then motion is required
+            self._cu.move_motor_rel(self._motorindex,new_rstep,new_rustep)
+            time.sleep(0.03)
+
+            #Waits for motion start
+            t = 0
+            while np.abs(start_angle-self.get_present_abs_angle())<180.0/(self._motorsteps*self._motorusteps):
+                time.sleep(0.01)
+                t += 0.01
+                if t > self._motion_timeout:
+                    raise InstrIOError('Timeout in waiting for motor to start')
+
+            self.is_moving(log_status=True) #Get log
+            time.sleep(0.01)
+
+            #Waits for motion end
+            t = 0
+            while self.is_moving(): 
+                time.sleep(0.01)
+                t += 0.01
+                if t > self._motion_timeout + desired_motion_steps/self._speed:
+                    raise InstrIOError('Timeout in waiting for motor to arrive destination')
+
+        self.is_moving(log_status=True) #Get final log
+
+    def get_present_abs_angle(self):
+        current_position_step, current_position_ustep = self._cu.get_position(self._motorindex)
+        return np.round(360.0*(current_position_step/self._motorsteps + current_position_ustep/(self._motorsteps*self._motorusteps)),9)
+
+    def is_moving(self,log_status=False):
+        moveSts,curSpeed,flags_strs = self._cu.get_present_status(self._motorindex)
+        res_moving = (bool(moveSts) or bool(curSpeed))
+        if log_status:
+            log = logging.getLogger(__name__)
+            msg = ('Rotate status: %s at speed %s')
+            log.info(msg,str(moveSts),str(curSpeed))
+            for flag_str in flags_strs:
+                log.info('8MRU_1TP motor flags: '+flag_str)
+        return res_moving
+
+
+
+class U8SMC5_8MR151_30_MEn1_Motor(DllInstrument):
+    """Class for controlling single stepper motor.
+
+    Attributes
+    ----------
+
+    
+    """
+
+    def __init__(self, connection_info, caching_allowed=True,
+                 caching_permissions={}, auto_open=True):
+
+        super(U8SMC5_8MR151_30_MEn1_Motor, self).__init__(connection_info, caching_allowed,
+                                      caching_permissions, auto_open)
+        self._infos = connection_info
+        self._id = int(self._infos['instr_id'])
+        self._cu = None
+        self._motorindex = None
+        self._motorsteps = None
+        self._motorusteps = None
+        self._motion_timeout = 5.0
+        if auto_open:
+            self.open_connection()
+
+    def open_connection(self):
+        """Setup the right motor axis based on the serial id.
+
+        """
+        log = logging.getLogger(__name__)
+        msg = ('Opening connection to 8MRU_1TP motor with dll')
+        log.info(msg)
+        self._cu = USMC5_Controller(self._infos)
+        self._cu.open_library()
+        #The following line returns the index used in dll calls to address this particular motor
+        self._motorindex = self._cu.request_motor(self._id)
+        #The standard parameters for the present motor type are to be applied only
+        #at first open for this instrument defined by its serial id
+        if not(self._cu.get_settings_done(self._id)):
+            #The following line applies a standard python language profile provided by Standa and 
+            #amended and appended to our pyximc.py
+            self._cu.apply_standard_settings('8MR151-30-MEn1',self._motorindex)
+            ##The following lines apply further fine tuning of these parameters
+            #self._cu.apply_engine_settings(self._motorindex,360,1000,10,0,144,1800,9,200)
+            #self._cu.apply_move_settings(self._motorindex,10,0,10,10,2000,0)
+            #self._cu.apply_home_settings(self._motorindex,100,0,50,0,-9,0,370)
+            #self._cu.apply_noemf_settings(self._motorindex)
+            #self._cu.apply_power_settings(self._motorindex,50,1000,60,300,4)
+            #self._cu.apply_brake_settings(self._motorindex,300,500,300,400,1)
+            #self._cu.apply_control_settings(self._motorindex,[60,600],[],[],300,2,1,0)
+            #self._cu.set_settings_done(self._id)
+        #According to parameters passed above, we have
+        self._motorsteps = 36000
+        self._motorusteps = 256
+        self._speed = 3
 
     def close_connection(self):
         """Close dll from the controller

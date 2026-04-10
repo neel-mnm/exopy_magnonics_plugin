@@ -496,6 +496,10 @@ enamldef HqcLegacyManifest(PluginManifest):
                     driver = 'U8SMC5:U8SMC5_8MRU_1TP_Motor'
                     manufacturer = 'Standa'
                     model = '8SMC5_USB_8MRU_1TP'
+                Driver:
+                    driver = 'U8SMC5:U8SMC5_8MR151_30_MEn1_Motor'
+                    manufacturer = 'Standa'
+                    model = 'U8SMC5_8MR151_30_MEn1'
 
             Drivers:
                 path = 'dotnet'
@@ -518,6 +522,10 @@ enamldef HqcLegacyManifest(PluginManifest):
                     driver = 'zi:MFLI'
                     manufacturer = 'Zurich Instruments'
                     model = 'MFLI'
+                Driver:
+                    driver = 'standa:Standa_8MR151_30_MEn1'
+                    manufacturer = 'Standa'
+                    model = '8MR151_30_MEn1'
 
     Extension:
         id = 'exopy_hqc_legacy.tasks'
@@ -963,14 +971,20 @@ enamldef HqcLegacyManifest(PluginManifest):
                     task = 'motor_tasks:MoveAbsMotorTask'
                     view = 'views.motor_views:MoveAbsMotorView'
                     instruments = ['exopy_hqc_legacy.Legacy.USMC_Motor',
-                                   'exopy_hqc_legacy.Legacy.U8SMC5_8MRU_1TP_Motor']
+                                   'exopy_hqc_legacy.Legacy.U8SMC5_8MRU_1TP_Motor',
+                                   'exopy_hqc_legacy.Legacy.U8SMC5_8MR151_30_MEn1_Motor',
+                                   'exopy_hqc_legacy.Legacy.Standa_8MR151_30_MEn1']
                 Task:
                     task = 'motor_tasks:MoveRelMotorTask'
                     view = 'views.motor_views:MoveRelMotorView'
                     instruments = ['exopy_hqc_legacy.Legacy.USMC_Motor',
-                                   'exopy_hqc_legacy.Legacy.U8SMC5_8MRU_1TP_Motor']                   
+                                   'exopy_hqc_legacy.Legacy.U8SMC5_8MRU_1TP_Motor',
+                                   'exopy_hqc_legacy.Legacy.U8SMC5_8MR151_30_MEn1_Motor',
+                                   'exopy_hqc_legacy.Legacy.Standa_8MR151_30_MEn1']                   
                 Task:
                     task = 'motor_tasks:MotorReturnAngleTask'
                     view = 'views.motor_views:MotorReturnAngleView'
                     instruments = ['exopy_hqc_legacy.Legacy.USMC_Motor',
-                                   'exopy_hqc_legacy.Legacy.U8SMC5_8MRU_1TP_Motor']
+                                   'exopy_hqc_legacy.Legacy.U8SMC5_8MRU_1TP_Motor',
+                                   'exopy_hqc_legacy.Legacy.U8SMC5_8MR151_30_MEn1_Motor',
+                                   'exopy_hqc_legacy.Legacy.Standa_8MR151_30_MEn1']

@@ -173,7 +173,7 @@ class Keysight81150A(VisaInstrument):
         '''
         Will currently ignore the existance of dutyCicle, isFinite, and numCycles
         '''
-        print("We in the driver bois")
+
         availableFunctions = ['SIN']
         if not isinstance(waveformFunction, str):
             raise ValueError('waveFormFunction needs to be a str')
@@ -191,7 +191,6 @@ class Keysight81150A(VisaInstrument):
         self.write(":VOLT:OFFS {}".format(offs))
         self.write(":VOLT:AMPL {}".format(ampl))
 
-        print("Stuff changed")
 
 
     

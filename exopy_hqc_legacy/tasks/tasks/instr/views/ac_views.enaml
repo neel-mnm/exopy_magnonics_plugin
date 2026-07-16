@@ -99,7 +99,7 @@ enamldef FiniteView(Container):
             tool_tip = fill('Number of pulses to be '
                             'delivered (float). \n'+EVALUATER_TOOLTIP,60)
 
-enamldef SetAcWaveformView(InstrView): view:
+enamldef SetAcCurrentWaveformView(InstrView): view:
     """View for the SetACCurrentWaveform.
 
     """
@@ -150,6 +150,139 @@ enamldef SetAcWaveformView(InstrView): view:
     Container: finite_container:
         padding = 0
         FiniteView:
+            on << task.waveform_finite
+            value := task.waveform_cycles
+
+
+enamldef ValueViewVolts(Container): 
+    """Sub-view for the SetACVoltageWaveform.
+
+    """
+    attr value1
+    attr value2
+
+    constraints = [grid([ampl_lab,compl_lab],
+                       [ampl_val,compl_val])]
+
+    Label: ampl_lab:
+        text = 'V_PP (V)'
+    QtLineCompleter: ampl_val:
+        resist_width = 'ignore'
+        text := value1
+        entries_updater << task.list_accessible_database_entries
+        tool_tip = EVALUATER_TOOLTIP
+    Label: compl_lab:
+        text = 'Compliance (not needed)'
+    QtLineCompleter: compl_val:
+        resist_width = 'ignore'
+        text := value2
+        entries_updater << task.list_accessible_database_entries
+        tool_tip = EVALUATER_TOOLTIP
+
+enamldef GridViewAVolt(Container): 
+    """Sub-view for the SetACVoltageWaveform.
+
+    """
+    attr value1
+    attr value2
+
+    constraints = [grid([offset_lab,duty_lab],
+                       [offset_val,duty_val]),
+                   offset_val.width == duty_val.width]
+
+    Label: offset_lab:
+        text = 'Offset (V)'
+    QtLineCompleter: offset_val:
+        resist_width = 'ignore'
+        text := value1
+        entries_updater << task.list_accessible_database_entries
+        tool_tip = EVALUATER_TOOLTIP
+
+    Label: duty_lab:
+        text = 'Duty cycle'
+    FloatField: duty_val:
+        resist_width = 'ignore'
+        value := value2
+
+enamldef FiniteViewVoltage(Container): 
+    """Sub-view for the SetACVoltageWaveform.
+
+    """
+    attr on
+    attr value
+
+    constraints = [factory(auto_grid_layout)]
+
+    Label: finite_lab:
+        text = 'Finite waveform'
+    CheckBox: finite_val:
+        checked := task.waveform_finite
+        tool_tip = fill('Check to make the instrument '
+                        'only deliver a finite number '
+                        'of pulses',60)
+    Conditional:
+        condition << on
+        Label: finiteval_lab:
+            text = 'Number of cycles'
+        QtLineCompleter: finiteval_val:
+            hug_width = 'ignore'
+            text := value
+            entries_updater << task.list_accessible_database_entries
+            tool_tip = fill('Number of pulses to be '
+                            'delivered (float). \n'+EVALUATER_TOOLTIP,60)
+
+            
+enamldef SetAcVoltageWaveformView(InstrView): view:
+    """View for the SetACVoltageWaveform.
+
+    """
+    #: Attribute set by the parent view if the task is embedded inside a
+    #: LoopTask
+    attr in_loop : bool = False
+
+    constraints = [vbox(grid([instr_label, function_lab, freq_lab],
+                             [instr_selection, function_val, freq_val]),
+                        hbox(value_container, grid_container,finite_container)
+                        ),
+                   value_container.height == grid_container.height,
+                   finite_container.height == grid_container.height,
+                   2*value_container.width == grid_container.width,
+                   finite_container.width == grid_container.width
+                  ]
+
+    Label: function_lab:
+        text = 'Waveform type'
+    Field: function_val:
+        resist_width = 'ignore'
+        text := task.waveform_function
+        tool_tip = fill('Type here fucntion code without quotes,'
+                        ' e.g., SIN',60)
+
+    Label: freq_lab:
+        text = 'Freq (Hz)'
+    QtLineCompleter: freq_val:
+        hug_width = 'ignore'
+        text := task.waveform_freq
+        entries_updater << task.list_accessible_database_entries
+        tool_tip = EVALUATER_TOOLTIP
+
+    Container: value_container:
+        padding = 0
+        Conditional:
+            condition = not in_loop
+            ValueViewVolts:
+                value1 := task.waveform_ampl
+                value2 := task.compliance_V
+
+    Container: grid_container:
+        padding = 0
+        GridViewAVolt: 
+            value1 := task.waveform_offset
+            value2 := task.waveform_duty
+
+    Container: finite_container:
+        padding = 0
+        FiniteViewVoltage:
             on << task.waveform_finite
             value := task.waveform_cycles
 

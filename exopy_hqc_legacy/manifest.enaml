@@ -910,9 +910,12 @@ enamldef HqcLegacyManifest(PluginManifest):
                                    'exopy_hqc_legacy.Legacy.RohdeSchwarzFSV7']
                 Task:
                     task = 'ac_tasks:SetACCurrentWaveform'
-                    view = 'views.ac_views:SetAcWaveformView'
-                    instruments = ['exopy_hqc_legacy.Legacy.Keithley6221',
-                                   'exopy_hqc_legacy.Legacy.Keysight81150A']
+                    view = 'views.ac_views:SetAcCurrentWaveformView'
+                    instruments = ['exopy_hqc_legacy.Legacy.Keithley6221']
+                Task:
+                    task = 'ac_tasks:SetACVoltageWaveform'
+                    view = 'views.ac_views:SetAcVoltageWaveformView'
+                    instruments = ['exopy_hqc_legacy.Legacy.Keysight81150A']
                 Task:
                     task = 'ac_tasks:SetACOutputTask'
                     view = 'views.ac_views:SetAcOutputView'

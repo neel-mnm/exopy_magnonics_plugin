@@ -240,6 +240,13 @@ enamldef HqcLegacyManifest(PluginManifest):
                                        'VisaUSB': {'resource_class': 'INSTR'},
                                        'VisaTCPIP': {'resource_class': 'INSTR'}
                                        }
+                    Driver:
+                        driver = 'agilent_function_generators:Keysight81150A'
+                        model  = '81150A'
+                        connections = {'VisaGPIB': {'resource_class': 'INSTR'},
+                                       'VisaUSB': {'resource_class': 'INSTR'},
+                                       'VisaTCPIP': {'resource_class': 'INSTR'}
+                                       }
                 Drivers:
                     manufacturer = 'Yokogawa'
                     Driver:
@@ -667,7 +674,8 @@ enamldef HqcLegacyManifest(PluginManifest):
                     instruments = ['exopy_hqc_legacy.Legacy.LockInSR7265',
                                    'exopy_hqc_legacy.Legacy.LockInSR7270',
                                    'exopy_hqc_legacy.Legacy.LockInSR7280',
-                                   'exopy_hqc_legacy.Legacy.LockInSR830']
+                                   'exopy_hqc_legacy.Legacy.LockInSR830',
+                                   'exopy_hqc_legacy.Legacy.Keysight81150A']
                     metadata = {'loopable': True}
                     Interface:
                         interface = 'set_lockin_parameters_tasks:MultiChannelOutputAmplitudeInterface'
@@ -903,7 +911,8 @@ enamldef HqcLegacyManifest(PluginManifest):
                 Task:
                     task = 'ac_tasks:SetACCurrentWaveform'
                     view = 'views.ac_views:SetAcWaveformView'
-                    instruments = ['exopy_hqc_legacy.Legacy.Keithley6221']
+                    instruments = ['exopy_hqc_legacy.Legacy.Keithley6221',
+                                   'exopy_hqc_legacy.Legacy.Keysight81150A']
                 Task:
                     task = 'ac_tasks:SetACOutputTask'
                     view = 'views.ac_views:SetAcOutputView'
@@ -988,3 +997,7 @@ enamldef HqcLegacyManifest(PluginManifest):
                                    'exopy_hqc_legacy.Legacy.U8SMC5_8MRU_1TP_Motor',
                                    'exopy_hqc_legacy.Legacy.U8SMC5_8MR151_30_MEn1_Motor',
                                    'exopy_hqc_legacy.Legacy.Standa_8MR151_30_MEn1']
+                Task:
+                    task = 'agilent_function_generator_tasks:SetGeneratorOutputStateTask'
+                    view = 'views.agilent_function_generator_views:SetOutputStateView'
+                    instruments = ['exopy_hqc_legacy.Legacy.Keysight81150A']

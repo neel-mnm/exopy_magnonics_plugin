@@ -1,17 +1,10 @@
-# -*- coding: utf-8 -*-
-# -----------------------------------------------------------------------------
-# Copyright 2015-2021 by ExopyHqcLegacy Authors, see AUTHORS for more details.
-#
-# Distributed under the terms of the BSD license.
-#
-# The full license is in the file LICENCE, distributed with this software.
-# -----------------------------------------------------------------------------
-"""Drivers for Keysight PSG SignalGenerator using VISA library.
+"""Drivers for Keysight 81150A Pulse Function Generator using VISA library.
 
 """
 import re
 from textwrap import fill
 from inspect import cleandoc
+import numpy as np
 
 try:
     from pyvisa import VisaTypeError
@@ -24,14 +17,10 @@ from ..driver_tools import (InstrIOError, instrument_property,
 from ..visa_tools import VisaInstrument
 
 
-class AgilentPSG(VisaInstrument):
+class Keysight81150A(VisaInstrument):
     """
-    Generic driver for Agilent PSG SignalGenerator, using the VISA library.
+    Generic driver for Keysight81150A, using the VISA library.
 
-    This driver does not give access to all the functionnality of the
-    instrument but you can extend it if needed. See the documentation of
-    the driver_tools module for more details about writing instruments
-    drivers.
 
     Parameters
     ----------
@@ -58,14 +47,15 @@ class AgilentPSG(VisaInstrument):
     def __init__(self, connection_info, caching_allowed=True,
                  caching_permissions={}, auto_open=True):
 
-        super(AgilentPSG, self).__init__(connection_info, caching_allowed,
+        super(Keysight81150A, self).__init__(connection_info, caching_allowed,
                                          caching_permissions, auto_open)
-        self.frequency_unit = 'GHz'
+        self.frequency_unit = 'Hz'
         self.phase_unit = 'Deg'
         self.write_termination = '\n'
         self.read_termination = '\n'
 
-
+        self.freqLimits = [float(self.query(":FREQ? MIN")), float(self.query(":FREQ? MAX"))]
+        self.voltageLimits = [float(self.query(":VOLT:LIM:LOW?")), float(self.query(":VOLT:LIM:HIGH?"))]
     @instrument_property
     @secure_communication()
     def frequency(self):
@@ -97,31 +87,8 @@ class AgilentPSG(VisaInstrument):
                 mes = 'Instrument did not set correctly the frequency'
                 raise InstrIOError(mes)
         else:
-            raise InstrIOError('PSG signal generator did not return its frequency')
+            raise InstrIOError('Signal generator did not return its frequency')
 
-    @instrument_property
-    @secure_communication()
-    def power(self):
-        """Power getter method
-        """
-        power = self.query(':POWER?')
-        if power:
-            return float(power)
-        else:
-            raise InstrIOError
-
-    @power.setter
-    @secure_communication()
-    def power(self, value):
-        """Power setter method
-        """
-        self.write(':POWER {}DBM'.format(value))
-        result = self.query('POWER?')
-        if result:
-            if abs(float(result) - value) > 10**-12:
-                raise InstrIOError('Instrument did not set correctly the power')
-        else:
-            raise InstrIOError('PSG signal generator did not return its power')
 
     @instrument_property
     @secure_communication()
@@ -156,6 +123,78 @@ class AgilentPSG(VisaInstrument):
             mess = fill(cleandoc('''The invalid value {} was sent to
                         switch_on_off method''').format(value), 80)
             raise VisaTypeError(mess)
+        
+    @secure_communication()
+    def open_signal_output(self, value):
+        """Output setter method
+        """
+        on = re.compile('on', re.IGNORECASE)
+        off = re.compile('off', re.IGNORECASE)
+        if (isinstance(value, str) and on.match(value)) or value == 1:
+            self.write(':OUTPUT ON')
+            if self.query(':OUTPUT?') != '1':
+                raise InstrIOError(cleandoc('''Instrument did not set correctly
+                                        the output'''))
+        elif (isinstance(value, str) and off.match(value)) or value == 0:
+            self.write(':OUTPUT OFF')
+            if self.query(':OUTPUT?') != '0':
+                raise InstrIOError(cleandoc('''Instrument did not set correctly
+                                        the output'''))
+        else:
+            mess = fill(cleandoc('''The invalid value {} was sent to
+                        switch_on_off method''').format(value), 80)
+            raise VisaTypeError(mess)
+        
+
+    @secure_communication()
+    def set_output_offset(self, value):
+        """Output setter method
+        """
+
+        if not isinstance(value, (float, int)):
+            raise ValueError("Invalid value type")
+        max = float(self.query("VOLT:LIM:HIGH?"))
+        min=  float(self.query("VOLT:LIM:LOW?"))
+
+        if value > max or value < min:
+            raise ValueError("Value outside output range")
+        
+        self.write("VOLT:OFFS {}".format(value))
+
+
+    #@secure_communication()
+    def set_ac_waveform(self, waveformFunction, 
+                        freq,
+                        ampl,
+                        offs,
+                        dutyCycle,
+                        isFinite,
+                        numCycles):
+        '''
+        Will currently ignore the existance of dutyCicle, isFinite, and numCycles
+        '''
+        print("We in the driver bois")
+        availableFunctions = ['SIN']
+        if not isinstance(waveformFunction, str):
+            raise ValueError('waveFormFunction needs to be a str')
+        
+        if waveformFunction.upper() not in availableFunctions:
+            raise ValueError(f"Provided waveform is not implemented. Implemented functions are {[func+',' for func in availableFunctions]}")
+        
+        if freq>self.freqLimits[1] or freq<self.freqLimits[0]:
+            raise ValueError(f"Set frequency out of bounds. Use values between {self.freqLimits[0]} and {self.freqLimits[1]}")
+
+        if np.abs(ampl) + np.abs(offs) > self.voltageLimits[1] or -np.abs(ampl) - np.abs(offs)<self.voltageLimits[0]:
+            raise ValueError(f"Set total amplitude of {np.max((np.abs(ampl) + np.abs(offs),np.abs(np.abs(ampl) + np.abs(offs))))} out of bounds. Voltage limits are between {self.voltageLimits[0]} and {self.voltageLimits[1]}")
+
+        self.write(":FUNC {}".format(waveformFunction.upper()))
+        self.write(":VOLT:OFFS {}".format(offs))
+        self.write(":VOLT:AMPL {}".format(ampl))
+
+        print("Stuff changed")
+
+
+    
 
     @instrument_property
     @secure_communication()
@@ -190,7 +229,7 @@ class AgilentPSG(VisaInstrument):
                 mes = 'Instrument did not set correctly the phase'
                 raise InstrIOError(mes)
         else:
-            raise InstrIOError('PSG signal generator did not return its phase')
+            raise InstrIOError('Signal generator did not return its phase')
 
 
 

@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+    # -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Copyright 2015-2018 by ExopyHqcLegacy Authors, see AUTHORS for more details.
 #
@@ -81,7 +81,7 @@ class SetACCurrentWaveform(InterfaceableTaskMixin, InstrumentTask):
         compl=self.format_and_eval_string(self.compliance_V)
         offset=self.format_and_eval_string(self.waveform_offset)
         cycles=self.format_and_eval_string(self.waveform_cycles)
-
+        
         self.driver.set_ac_waveform(self.waveform_function,
                                     freq,
                                     ampl,

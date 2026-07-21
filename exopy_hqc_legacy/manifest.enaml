@@ -1016,7 +1016,3 @@ enamldef HqcLegacyManifest(PluginManifest):
                                    'exopy_hqc_legacy.Legacy.U8SMC5_8MRU_1TP_Motor',
                                    'exopy_hqc_legacy.Legacy.U8SMC5_8MR151_30_MEn1_Motor',
                                    'exopy_hqc_legacy.Legacy.Standa_8MR151_30_MEn1']
-                Task:
-                    task = 'agilent_function_generator_tasks:SetGeneratorOutputStateTask'
-                    view = 'views.agilent_function_generator_views:SetOutputStateView'
-                    instruments = ['exopy_hqc_legacy.Legacy.Keysight81150A']

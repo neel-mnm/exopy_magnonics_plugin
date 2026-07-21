@@ -6,13 +6,13 @@
 #
 # The full license is in the file LICENCE, distributed with this software.
 # -----------------------------------------------------------------------------
-"""Views for the Anapico multi=channel RF source interfaces.
+"""Views for the multi-channel RF source interfaces.
 
 """
 from enaml.widgets.api import Label
 from enaml.stdlib.fields import IntField
 
-enamldef IAnapicoChannelLabel(Label):
+enamldef IMultiRFChannelLabel(Label):
     """Label for the channel selection.
 
     """
@@ -22,7 +22,7 @@ enamldef IAnapicoChannelLabel(Label):
     text = 'Channel'
 
 
-enamldef IAnapicoChannelValue(IntField):
+enamldef IMultiRFChannelValue(IntField):
     """Value for the channel selection.
 
     """

@@ -154,7 +154,7 @@ class SetRFOnOffTask(InterfaceableTaskMixin, InstrumentTask):
             self.write_in_database('output', 0)
 
 
-class SetPulseModulationTask(InterfaceableTaskMixin, InstrumentTask):
+class SetRFPulseModulationTask(InterfaceableTaskMixin, InstrumentTask):
     """Switch on/off the pulse modulation of the source.
 
     """
@@ -177,7 +177,7 @@ class SetPulseModulationTask(InterfaceableTaskMixin, InstrumentTask):
         """Validate the value of the switch.
 
         """
-        test, traceback = super(SetPulseModulationTask, self).check(*args,
+        test, traceback = super(SetRFPulseModulationTask, self).check(*args,
                                                                     **kwargs)
 
         if test and self.switch:

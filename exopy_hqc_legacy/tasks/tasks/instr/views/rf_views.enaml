@@ -103,7 +103,7 @@ enamldef RFSetOnOffView(InstrView): view:
             items << list(["'ON'","'OFF'"])
             selected := task.switch
 
-enamldef PulseModulationView(InstrView): view:
+enamldef RFPulseModulationView(InstrView): view:
     """View for the PulseModulationTask.
 
     """

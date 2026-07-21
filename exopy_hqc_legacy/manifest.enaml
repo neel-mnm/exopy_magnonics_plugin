@@ -247,6 +247,13 @@ enamldef HqcLegacyManifest(PluginManifest):
                                        'VisaUSB': {'resource_class': 'INSTR'},
                                        'VisaTCPIP': {'resource_class': 'INSTR'}
                                        }
+                    Driver:
+                        driver = 'keysight_anapico:KeysightAP50X2A_002'
+                        serie = 'AP'
+                        model = 'AP50X2A_002'
+                        kind = 'RF source'
+                        connections = {'VisaTCPIP': {'resource_class': 'INSTR'}
+                                       }
                 Drivers:
                     manufacturer = 'Yokogawa'
                     Driver:
@@ -789,10 +796,11 @@ enamldef HqcLegacyManifest(PluginManifest):
                                  'views.synthHD_task_views:ISynthHDChannelValue']
                         instruments = ['exopy_hqc_legacy.Legacy.SynthHD']
                     Interface:
-                        interface = 'anapico_tasks:AnapicoSetChannelInterface'
-                        views = ['views.anapico_task_views:IAnapicoChannelLabel',
-                                 'views.anapico_task_views:IAnapicoChannelValue']
-                        instruments = ['exopy_hqc_legacy.Legacy.AnapicoMulti']
+                        interface = 'multirf_tasks:MultiRFSetChannelInterface'
+                        views = ['views.multirf_task_views:IMultiRFChannelLabel',
+                                 'views.multirf_task_views:IMultiRFChannelValue']
+                        instruments = ['exopy_hqc_legacy.Legacy.AnapicoMulti',
+                                       'exopy_hqc_legacy.Legacy.KeysightAP50X2A_002']
                 Task:
                     task = 'rf_tasks:SetRFPowerTask'
                     view = 'views.rf_views:RFPowerView'
@@ -819,10 +827,11 @@ enamldef HqcLegacyManifest(PluginManifest):
                                  'views.synthHD_task_views:ISynthHDChannelValue']
                         instruments = ['exopy_hqc_legacy.Legacy.SynthHD']
                     Interface:
-                        interface = 'anapico_tasks:AnapicoSetChannelInterface'
-                        views = ['views.anapico_task_views:IAnapicoChannelLabel',
-                                 'views.anapico_task_views:IAnapicoChannelValue']
-                        instruments = ['exopy_hqc_legacy.Legacy.AnapicoMulti']
+                        interface = 'multirf_tasks:MultiRFSetChannelInterface'
+                        views = ['views.multirf_task_views:IMultiRFChannelLabel',
+                                 'views.multirf_task_views:IMultiRFChannelValue']
+                        instruments = ['exopy_hqc_legacy.Legacy.AnapicoMulti',
+                                       'exopy_hqc_legacy.Legacy.KeysightAP50X2A_002']
                 Task:
                     task = 'rf_tasks:SetRFOnOffTask'
                     view = 'views.rf_views:RFSetOnOffView'
@@ -842,26 +851,33 @@ enamldef HqcLegacyManifest(PluginManifest):
                                  'views.synthHD_task_views:ISynthHDChannelValue']
                         instruments = ['exopy_hqc_legacy.Legacy.SynthHD']
                     Interface:
-                        interface = 'anapico_tasks:AnapicoSetChannelInterface'
-                        views = ['views.anapico_task_views:IAnapicoChannelLabel',
-                                 'views.anapico_task_views:IAnapicoChannelValue']
-                        instruments = ['exopy_hqc_legacy.Legacy.AnapicoMulti']
+                        interface = 'multirf_tasks:MultiRFSetChannelInterface'
+                        views = ['views.multirf_task_views:IMultiRFChannelLabel',
+                                 'views.multirf_task_views:IMultiRFChannelValue']
+                        instruments = ['exopy_hqc_legacy.Legacy.AnapicoMulti',
+                                       'exopy_hqc_legacy.Legacy.KeysightAP50X2A_002']
                 Task:
-                    task = 'rf_tasks:SetPulseModulationTask'
-                    view = 'views.rf_views:PulseModulationView'
+                    task = 'rf_tasks:SetRFPulseModulationTask'
+                    view = 'views.rf_views:RFPulseModulationView'
                     instruments = ['exopy_hqc_legacy.Legacy.RohdeSchwarzSMB100A',
                                    'exopy_hqc_legacy.Legacy.RohdeSchwarzSMF100A',
                                    'exopy_hqc_legacy.Legacy.Anapico']
                     Interface:
-                        interface = 'anapico_tasks:AnapicoSetChannelInterface'
-                        views = ['views.anapico_task_views:IAnapicoChannelLabel',
-                                 'views.anapico_task_views:IAnapicoChannelValue']
-                        instruments = ['exopy_hqc_legacy.Legacy.AnapicoMulti']
+                        interface = 'multirf_tasks:MultiRFSetChannelInterface'
+                        views = ['views.multirf_task_views:IMultiRFChannelLabel',
+                                 'views.multirf_task_views:IMultiRFChannelValue']
+                        instruments = ['exopy_hqc_legacy.Legacy.AnapicoMulti',
+                                       'exopy_hqc_legacy.Legacy.KeysightAP50X2A_002']
                 Task:
                     task = 'rf_tasks:SetRFPhaseTask'
                     view = 'views.rf_views:RFPhaseView'
                     instruments = ['exopy_hqc_legacy.Legacy.AgilentPSG']
                     metadata = {'loopable': True}
+                    Interface:
+                        interface = 'multirf_tasks:MultiRFSetChannelInterface'
+                        views = ['views.multirf_task_views:IMultiRFChannelLabel',
+                                 'views.multirf_task_views:IMultiRFChannelValue']
+                        instruments = ['exopy_hqc_legacy.Legacy.KeysightAP50X2A_002']
                 Task:
                     task = 'pna_tasks:PNASinglePointMeasureTask'
                     view = 'views.pna_task_views:PNASinglePointView'

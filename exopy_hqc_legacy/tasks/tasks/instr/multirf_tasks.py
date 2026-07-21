@@ -14,7 +14,7 @@ from atom.api import Int
 from exopy.tasks.api import TaskInterface
 
 
-class AnapicoSetChannelInterface(TaskInterface):
+class MultiRFSetChannelInterface(TaskInterface):
     """Set the central frequency to be used for the specified channel.
 
     """

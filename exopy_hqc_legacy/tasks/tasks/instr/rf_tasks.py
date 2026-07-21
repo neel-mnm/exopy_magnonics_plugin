@@ -215,6 +215,7 @@ class SetRFPulseModulationTask(InterfaceableTaskMixin, InstrumentTask):
 
         if switch == 'On' or switch == 1:
             self.driver.pm_state = 'On'
+            self.driver.video_state = 'On'
             self.write_in_database('pm_state', 1)
         else:
             self.driver.pm_state = 'Off'

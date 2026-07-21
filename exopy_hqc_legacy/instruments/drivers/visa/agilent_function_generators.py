@@ -190,6 +190,7 @@ class Keysight81150A(VisaInstrument):
         self.write(":FUNC {}".format(waveformFunction.upper()))
         self.write(":VOLT:OFFS {}".format(offs))
         self.write(":VOLT:AMPL {}".format(ampl))
+        self.write(":FREQ {}".format(freq))
 
 
 

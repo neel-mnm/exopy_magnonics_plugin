@@ -106,7 +106,7 @@ class Danfysik9100(VisaInstrument):
 
     def update_connection_parameters(self):
         super(Danfysik9100, self).close_connection()
-        super(Danfysik9100, self).open_connection(baud_rate=self.baudrate,
+        self.open_connection(baud_rate=self.baudrate,
                                                   flow_control=self.flowcontrol,
                                                   parity=self.parity,
                                                   data_bits=self.databits,

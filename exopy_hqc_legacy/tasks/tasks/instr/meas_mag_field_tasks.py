@@ -9,7 +9,7 @@ from atom.api import (Float, Value, Str, set_default)
 from exopy.tasks.api import InstrumentTask, validators
 
 
-class MeasMagFieldTask(InstrumentTask):
+class MeasDCMagFieldTask(InstrumentTask):
     """Measure an applied magnetic field.
 
     Wait for any parallel operation before execution and then wait the

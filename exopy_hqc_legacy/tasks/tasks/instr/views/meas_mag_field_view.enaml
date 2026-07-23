@@ -21,7 +21,7 @@ from exopy_hqc_legacy.utils.layouts import auto_grid_layout
 from ...base_instr_view import InstrView
 
 
-enamldef MeasMagFieldView(InstrView): view:
+enamldef MeasDCMagFieldView(InstrView): view:
     """View for the MeasMagFieldTask.
 
     """

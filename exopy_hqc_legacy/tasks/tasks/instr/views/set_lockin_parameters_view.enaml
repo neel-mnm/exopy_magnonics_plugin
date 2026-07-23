@@ -109,22 +109,28 @@ enamldef SetDemodBWandSampleView(InstrView): view:
 
 
 enamldef SetOutputStateView(InstrView): view:
-    """View for SetOutputStateTask
-
-    """
+    """View for SetOutputStateTask"""
     constraints = [factory(auto_grid_layout)]
+
     Label:
         text = 'Enable Output'
-    
+
     HGroup:
         RadioButton:
-            text="ON"        
-            checked:=task.value
-        
+            text = "ON"
+            checked << task.value
+
+            toggled ::
+                if checked:
+                    task.value = True
+
         RadioButton:
-            text="OFF"
+            text = "OFF"
             checked << (not task.value)
-            checked >> task.value
+
+            toggled ::
+                if checked:
+                    task.value = False
 
 enamldef SetOutputOffsetView(InstrView): view:
     """View for the SetOutputOffsetTask

@@ -56,6 +56,7 @@ class Keysight81150A(VisaInstrument):
 
         self.freqLimits = [float(self.query(":FREQ? MIN")), float(self.query(":FREQ? MAX"))]
         self.voltageLimits = [float(self.query(":VOLT:LIM:LOW?")), float(self.query(":VOLT:LIM:HIGH?"))]
+    
     @instrument_property
     @secure_communication()
     def frequency(self):
@@ -123,21 +124,38 @@ class Keysight81150A(VisaInstrument):
             mess = fill(cleandoc('''The invalid value {} was sent to
                         switch_on_off method''').format(value), 80)
             raise VisaTypeError(mess)
-        
+
+
+#    @instrument_property
+#    @secure_communication()
+#    def open_signal_output(self):
+#        """
+#        Output state getter method
+#        """
+#        output = self.query(':OUTPUT?')
+#        if output:
+#            return bool(int(output))
+#        else:
+#            mes = 'PSG signal generator did not return its output'
+#            raise InstrIOError(mes)
+
     @secure_communication()
     def open_signal_output(self, value):
         """Output setter method
         """
         on = re.compile('on', re.IGNORECASE)
         off = re.compile('off', re.IGNORECASE)
-        if (isinstance(value, str) and on.match(value)) or value == 1:
-            self.write(':OUTPUT ON')
-            if self.query(':OUTPUT?') != '1':
+        print("Value is {}".format(value))
+        if value is True or (isinstance(value, str) and on.match(value)) or value == 1:
+            self.write(':OUTP ON')
+            print("We here bois")
+            if self.query(':OUTP?') != '1':
                 raise InstrIOError(cleandoc('''Instrument did not set correctly
                                         the output'''))
-        elif (isinstance(value, str) and off.match(value)) or value == 0:
-            self.write(':OUTPUT OFF')
-            if self.query(':OUTPUT?') != '0':
+        elif value is False or (isinstance(value, str) and off.match(value)) or value == 0:
+            print("We not here bois")
+            self.write(':OUTP OFF')
+            if self.query(':OUTP?') != '0':
                 raise InstrIOError(cleandoc('''Instrument did not set correctly
                                         the output'''))
         else:
@@ -162,7 +180,6 @@ class Keysight81150A(VisaInstrument):
         self.write("VOLT:OFFS {}".format(value))
 
 
-    #@secure_communication()
     def set_ac_waveform(self, waveformFunction, 
                         freq,
                         ampl,
@@ -174,62 +191,27 @@ class Keysight81150A(VisaInstrument):
         Will currently ignore the existance of dutyCicle, isFinite, and numCycles
         '''
 
-        availableFunctions = ['SIN']
+        availableFunctions = ['SIN', 'DC']
         if not isinstance(waveformFunction, str):
             raise ValueError('waveFormFunction needs to be a str')
+
+        if freq == 0 or ampl == 0:
+            waveformFunction = "DC"
         
         if waveformFunction.upper() not in availableFunctions:
             raise ValueError(f"Provided waveform is not implemented. Implemented functions are {[func+',' for func in availableFunctions]}")
         
-        if freq>self.freqLimits[1] or freq<self.freqLimits[0]:
+        if (freq>self.freqLimits[1] or freq<self.freqLimits[0]) and waveformFunction.upper!="DC":
             raise ValueError(f"Set frequency out of bounds. Use values between {self.freqLimits[0]} and {self.freqLimits[1]}")
 
         if np.abs(ampl) + np.abs(offs) > self.voltageLimits[1] or -np.abs(ampl) - np.abs(offs)<self.voltageLimits[0]:
             raise ValueError(f"Set total amplitude of {np.max((np.abs(ampl) + np.abs(offs),np.abs(np.abs(ampl) + np.abs(offs))))} out of bounds. Voltage limits are between {self.voltageLimits[0]} and {self.voltageLimits[1]}")
 
-        self.write(":FUNC {}".format(waveformFunction.upper()))
+        if freq == 0 or ampl == 0:
+            self.write(":FUNC {}".format(waveformFunction.upper()))
+        else:
+            self.write(":FUNC {}".format(waveformFunction.upper()))
+            self.write(":FREQ {}".format(freq))
         self.write(":VOLT:OFFS {}".format(offs))
         self.write(":VOLT:AMPL {}".format(ampl))
-        self.write(":FREQ {}".format(freq))
-
-
-
-    
-
-    @instrument_property
-    @secure_communication()
-    def phase(self):
-        """Phase getter method
-        """
-        phase = self.query(':PHASe?')
-        if phase:
-            return float(phase)
-        else:
-            raise InstrIOError
-
-    @phase.setter
-    @secure_communication()
-    def phase(self, value):
-        """Phase setter method
-        """
-        pi = 3.141592653589793
-        unit = self.phase_unit
-        self.write(':PHAS {}{}'.format(value, unit))
-        result = self.query(':PHASe?')
-        if unit == 'Deg':
-            value = value - (value//180)*180
-        elif unit == 'Rad':
-            value = value - (value//pi)*pi
-        if result:
-            result = float(result)
-            result = result - (result//pi)*pi
-            if unit == 'Deg':
-                result /= pi/180
-            if abs(result - value) > 10**-3:
-                mes = 'Instrument did not set correctly the phase'
-                raise InstrIOError(mes)
-        else:
-            raise InstrIOError('Signal generator did not return its phase')
-
-
-
+        

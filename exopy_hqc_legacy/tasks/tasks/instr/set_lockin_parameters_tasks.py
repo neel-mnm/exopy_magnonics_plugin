@@ -61,7 +61,7 @@ class SetOutputStateTask(InterfaceableTaskMixin, InstrumentTask):
     # Amplitude.
     value = Bool(False).tag(pref=True)
 
-    database_entries = set_default({'LI_output': "OFF"})
+    database_entries = set_default({'output': "OFF"})
 
     def i_perform(self,value=None, fromdemod=None):
         """ON or OFF.
@@ -69,11 +69,11 @@ class SetOutputStateTask(InterfaceableTaskMixin, InstrumentTask):
         """
         if self.value:
             self.driver.open_signal_output(True)
-            self.write_in_database('LI_output', "ON")
+            self.write_in_database('output', "ON")
         
         elif not self.value:
             self.driver.open_signal_output(False)
-            self.write_in_database('LI_output', "OFF")
+            self.write_in_database('output', "OFF")
         
 class SetOutputOffsetTask(InterfaceableTaskMixin, InstrumentTask):
     """

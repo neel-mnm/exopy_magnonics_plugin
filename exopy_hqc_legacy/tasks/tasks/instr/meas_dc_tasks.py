@@ -11,12 +11,13 @@
 """
 from time import sleep
 
-from atom.api import Float, set_default
+from atom.api import Float, Int, set_default
 
-from exopy.tasks.api import InstrumentTask
+from exopy.tasks.api import (InstrumentTask, InterfaceableTaskMixin, 
+                             TaskInterface)
 
 
-class MeasDCVoltageTask(InstrumentTask):
+class MeasDCVoltageTask(InterfaceableTaskMixin, InstrumentTask):
     """Measure a dc voltage.
 
     Wait for any parallel operation before execution and then wait the
@@ -30,7 +31,7 @@ class MeasDCVoltageTask(InstrumentTask):
 
     wait = set_default({'activated': True, 'wait': ['instr']})
 
-    def perform(self):
+    def i_perform(self):
         """Wait and read the DC voltage.
 
         """
@@ -61,3 +62,19 @@ class MeasDCCurrentTask(InstrumentTask):
 
         value = self.driver.read_current_dc()
         self.write_in_database('current', value)
+
+class MultiDCSetChannelInterface(TaskInterface):
+    """Set the specified channel.
+
+    """
+    #: Id of the channel whose central frequency should be set.
+    channel = Int(1).tag(pref=True)
+
+    def perform(self):
+        """Performs the task for the specified channel.
+
+        """
+        task = self.task
+        channel = self.channel
+        task.driver.channel = channel
+        task.i_perform()

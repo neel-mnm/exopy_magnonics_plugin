@@ -13,16 +13,15 @@ from atom.api import Int
 
 from exopy.tasks.api import TaskInterface
 
-
 class MultiRFSetChannelInterface(TaskInterface):
-    """Set the central frequency to be used for the specified channel.
+    """Set the specified channel.
 
     """
     #: Id of the channel whose central frequency should be set.
     channel = Int(1).tag(pref=True)
 
-    def perform(self, frequency=None):
-        """Set the central frequency of the specified channel.
+    def perform(self):
+        """Performs the task for the specified channel.
 
         """
         task = self.task

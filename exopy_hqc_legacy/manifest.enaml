@@ -211,6 +211,12 @@ enamldef HqcLegacyManifest(PluginManifest):
                                        'VisaTCPIP': {'resource_class': 'INSTR'}
                                        }
                     Driver:
+                        driver = 'agilent_multimeters:Agilent34420A'
+                        model = '34420A'
+                        kind = 'Multimeter'
+                        connections = {'VisaGPIB': {'resource_class': 'INSTR'}
+                                       }
+                    Driver:
                         driver = 'agilent_pna:AgilentPNA'
                         model = 'PNA'
                         connections = {'VisaGPIB': {'resource_class': 'INSTR'},
@@ -778,6 +784,11 @@ enamldef HqcLegacyManifest(PluginManifest):
                                    'exopy_hqc_legacy.Legacy.Agilent34410A',
                                    'exopy_hqc_legacy.Legacy.Yokogawa7651',
                                    'exopy_hqc_legacy.Legacy.YokogawaGS200']
+                    Interface:
+                        interface = 'meas_dc_tasks:MultiDCSetChannelInterface'
+                        views = ['views.meas_dc_views:IMultiDCChannelLabel',
+                                 'views.meas_dc_views:IMultiDCChannelValue']
+                        instruments = ['exopy_hqc_legacy.Legacy.Agilent34420A']
                 Task:
                     task = 'meas_dc_tasks:MeasDCCurrentTask'
                     view = 'views.meas_dc_views:MeasDCCurrentView'

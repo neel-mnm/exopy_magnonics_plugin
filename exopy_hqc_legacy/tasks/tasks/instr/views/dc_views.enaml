@@ -194,6 +194,31 @@ enamldef SetDcCurrentView(InstrView): view:
         resist_width = 'ignore'
         value := task.stab_wait
 
+enamldef SetDCVoltageProtectionView(InstrView): view:
+    """View for the SetDCVoltageProtectionTask.
+
+    """
+    #: Attribute set by the parent view if the task is embedded inside a
+    #: LoopTask
+    attr in_loop : bool = False
+    constraints = [factory(auto_grid_layout)]
+
+    Conditional:
+        condition << not in_loop
+        Label: 
+            text = 'Voltage protection (V)'
+        QtLineCompleter:
+            hug_width = 'ignore'
+            text := task.target_value
+            entries_updater << task.list_accessible_database_entries
+            tool_tip = EVALUATER_TOOLTIP
+
+    Label: safe:
+        text = 'Safe max (V)'
+    FloatField: safe_val:
+        resist_width = 'ignore'
+        value := task.safe_max
+
 enamldef SetDCCurrentComplianceView(InstrView): view:
     """View for the SetDCCurrentComplianceTask.
 

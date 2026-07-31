@@ -247,6 +247,11 @@ enamldef HqcLegacyManifest(PluginManifest):
                                        'VisaTCPIP': {'resource_class': 'INSTR'}
                                        }
                     Driver:
+                        driver = 'agilent_function_generators:Agilent33120A'
+                        model  = '33120A'
+                        connections = {'VisaGPIB': {'resource_class': 'INSTR'}
+                                       }
+                    Driver:
                         driver = 'agilent_function_generators:Keysight81150A'
                         model  = '81150A'
                         connections = {'VisaGPIB': {'resource_class': 'INSTR'},
@@ -298,6 +303,14 @@ enamldef HqcLegacyManifest(PluginManifest):
                                        'VisaRS232':
                                            {'resource_class': 'INSTR'}
                                        }                                       
+                    Driver:
+                        driver = 'keithley_multimeters:Keithley2400'
+                        model = '2400'
+                        kind = 'DC source'
+                        connections = {'VisaGPIB': {'resource_class': 'INSTR'},
+                                       'VisaRS232':
+                                           {'resource_class': 'INSTR'}
+                                       }
                     Driver:
                         driver = 'keithley_multimeters:Keithley2450'
                         model = '2450'
@@ -780,6 +793,7 @@ enamldef HqcLegacyManifest(PluginManifest):
                     view = 'views.meas_dc_views:MeasDCVoltView'
                     instruments = ['exopy_hqc_legacy.Legacy.Keithley2000',
                                    'exopy_hqc_legacy.Legacy.Keithley2182A',
+                                   'exopy_hqc_legacy.Legacy.Keithley2400',
                                    'exopy_hqc_legacy.Legacy.Keithley2450',
                                    'exopy_hqc_legacy.Legacy.Agilent34410A',
                                    'exopy_hqc_legacy.Legacy.Yokogawa7651',
@@ -792,7 +806,8 @@ enamldef HqcLegacyManifest(PluginManifest):
                 Task:
                     task = 'meas_dc_tasks:MeasDCCurrentTask'
                     view = 'views.meas_dc_views:MeasDCCurrentView'
-                    instruments = ['exopy_hqc_legacy.Legacy.Keithley2450']
+                    instruments = ['exopy_hqc_legacy.Legacy.Keithley2400',
+                                   'exopy_hqc_legacy.Legacy.Keithley2450']
                 Task:
                     task = 'rf_tasks:SetRFFrequencyTask'
                     view = 'views.rf_views:RFFrequencyView'
@@ -952,7 +967,8 @@ enamldef HqcLegacyManifest(PluginManifest):
                 Task:
                     task = 'ac_tasks:SetACVoltageWaveform'
                     view = 'views.ac_views:SetAcVoltageWaveformView'
-                    instruments = ['exopy_hqc_legacy.Legacy.Keysight81150A']
+                    instruments = ['exopy_hqc_legacy.Legacy.Agilent33120A',
+                                   'exopy_hqc_legacy.Legacy.Keysight81150A']
                 Task:
                     task = 'ac_tasks:SetACOutputTask'
                     view = 'views.ac_views:SetAcOutputView'
@@ -962,6 +978,7 @@ enamldef HqcLegacyManifest(PluginManifest):
                     view = 'views.dc_views:SetDcVoltageView'
                     instruments = ['exopy_hqc_legacy.Legacy.YokogawaGS200',
                                    'exopy_hqc_legacy.Legacy.Yokogawa7651',
+                                   'exopy_hqc_legacy.Legacy.Keithley2400',
                                    'exopy_hqc_legacy.Legacy.Keithley2450']
                     metadata = {'loopable': True}
                     Interface:
@@ -977,9 +994,15 @@ enamldef HqcLegacyManifest(PluginManifest):
                                  'MultiChannelVoltageSourceIChannel']
                         instruments = ['exopy_hqc_legacy.Legacy.TinyBilt']
                 Task:
+                    task = 'dc_tasks:SetDCVoltageProtectionTask'
+                    view = 'views.dc_views:SetDCVoltageProtectionView'
+                    instruments = ['exopy_hqc_legacy.Legacy.Keithley2400']
+                    metadata = {'loopable': True}
+                Task:
                     task = 'dc_tasks:SetDCCurrentComplianceTask'
                     view = 'views.dc_views:SetDCCurrentComplianceView'
-                    instruments = ['exopy_hqc_legacy.Legacy.Keithley2450',
+                    instruments = ['exopy_hqc_legacy.Legacy.Keithley2400',
+                                   'exopy_hqc_legacy.Legacy.Keithley2450',
                                    'exopy_hqc_legacy.Legacy.Keithley6221']
                     metadata = {'loopable': True}
                 Task:
@@ -992,12 +1015,14 @@ enamldef HqcLegacyManifest(PluginManifest):
                     view = 'views.dc_views:SetDcCurrentView'
                     instruments = ['exopy_hqc_legacy.Legacy.YokogawaGS200',
                                    'exopy_hqc_legacy.Legacy.Yokogawa7651',
+                                   'exopy_hqc_legacy.Legacy.Keithley2400',
                                    'exopy_hqc_legacy.Legacy.Keithley2450']
                     metadata = {'loopable': True}
                 Task:
                     task = 'dc_tasks:SetDCFunctionTask'
                     view = 'views.dc_views:SetDcFunctionView'
                     instruments = ['exopy_hqc_legacy.Legacy.YokogawaGS200',
+                                   'exopy_hqc_legacy.Legacy.Keithley2400',
                                    'exopy_hqc_legacy.Legacy.Keithley2450',
                                    'exopy_hqc_legacy.Legacy.Keithley6221']
                     metadata = {'loopable': True}
@@ -1005,6 +1030,7 @@ enamldef HqcLegacyManifest(PluginManifest):
                     task = 'dc_tasks:SetDCOutputTask'
                     view = 'views.dc_views:SetDcOutputView'
                     instruments = ['exopy_hqc_legacy.Legacy.YokogawaGS200',
+                                   'exopy_hqc_legacy.Legacy.Keithley2400',
                                    'exopy_hqc_legacy.Legacy.Keithley2450',
                                    'exopy_hqc_legacy.Legacy.Keithley6221']
                 Task:

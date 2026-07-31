@@ -284,6 +284,34 @@ class MultiChannelVoltageSourceInterface(TaskInterface):
         else:
             return True, {}
 
+class SetDCVoltageProtectionTask(InterfaceableTaskMixin, InstrumentTask):
+    """Set a DC voltage protection to the specified value.
+
+    The user can choose to limit the value by a safety max
+
+    """
+    #: Target value for the compliance
+    target_value = Str().tag(pref=True, feval=validators.SkipLoop(types=numbers.Real))
+
+    #: Largest allowed current
+    safe_max = Float(0.0).tag(pref=True)
+
+    parallel = set_default({'activated': True, 'pool': 'instr'})
+    database_entries = set_default({'voltage_protection': 0.01})
+
+    def i_perform(self, value=None):
+        """Default interface.
+
+        """
+        if value is None:
+            value = self.format_and_eval_string(self.target_value)
+
+        if self.safe_max and self.safe_max < abs(value):
+            msg = 'Requested current {} exceeds safe max : {}'
+            raise ValueError(msg.format(value, self.safe_max))
+
+        self.driver.voltage_protection = value
+        self.write_in_database('voltage_protection', value)
 
 class SetDCCurrentComplianceTask(InterfaceableTaskMixin, InstrumentTask):
     """Set a DC current compliance to the specified value.

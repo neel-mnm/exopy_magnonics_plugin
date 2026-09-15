@@ -202,6 +202,8 @@ class HF2LIDemodChannel(BaseInstrument):
         '/' + device + '/demods/{}/order'.format(channel_num-1))
         self._header_demod_datarate = (
         '/' + device + '/demods/{}/rate'.format(channel_num-1))
+        self.demod_datarate = self.get_datarate()
+        self.log_prefix = 'ZI demod channel {}'.format(channel_num)
 
     def reopen_connection(self):
 
@@ -285,6 +287,7 @@ class HF2LIDemodChannel(BaseInstrument):
         if self._channel>5:
             raise ValueError('The instrument can only set rate for chans 1-6')
         self._daqserv.setDouble(self._header_demod_datarate, rate)
+        self.demod_datarate = rate
 
     def read_x(self):
         """
@@ -349,8 +352,11 @@ class HF2LIDemodChannel(BaseInstrument):
         independent values if the instrument is queried too often.
 
         """
-        x=self._daqserv.getSample(self._header_demod_sample)['x'][0]
-        y=self._daqserv.getSample(self._header_demod_sample)['y'][0]
+        #x=self._daqserv.getSample(self._header_demod_sample)['x'][0]
+        #y=self._daqserv.getSample(self._header_demod_sample)['y'][0]
+        data = self._daqserv.poll(3/self.demod_datarate,500)
+        x = data[self._device_id.lower()]['demods'][str(self._channel-1)]['sample']['x'][-1]
+        y = data[self._device_id.lower()]['demods'][str(self._channel-1)]['sample']['y'][-1]
         return (np.sqrt(x**2+y**2),np.arctan2(y,x)*180/np.pi)
 
     @secure_communication()
@@ -888,7 +894,16 @@ class HF2LI(PyAPIInstrument):
             channel = HF2LIDemodChannel(self, 
                                         num, 
                                         device='{}'.format(self._id))
+            log = logging.getLogger(__name__)
+            msg = ('Created new demod channel: {}')
+            log.info(msg.format(num))
             self.demod_channels[num] = channel
+            self.daq_serv.unsubscribe('*')
+            nodes_list = []
+            for channel_num in self.demod_channels:
+                nodes_list.append(self.demod_channels[channel_num]._header_demod_sample)
+            self.daq_serv
+            self.daq_serv.subscribe(nodes_list)
             return channel
 
     def get_out_channel(self, num):
